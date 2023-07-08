@@ -11,6 +11,15 @@ export class User {
   ) {}
 
   set name(name: string) {
+    if (!name)
+      throw new HttpException(
+        'Nome é obrigatório',
+        // This code is used to create a new user.
+        // The user's email address is stored in the variable email.
+        // This code is called when the user clicks the "Create User" button.
+        // The function createUser() is called when the user clicks the "Create User" button.
+        HttpStatus.BAD_REQUEST,
+      );
     if (name.length < 3)
       throw new HttpException(
         'Nome precisa ser pelomenos 3 caracteres',
@@ -24,6 +33,11 @@ export class User {
   }
 
   set email(email: string) {
+    if (!email)
+      throw new HttpException(
+        'Email é obrigatório',
+        HttpStatus.BAD_REQUEST,
+      );
     this._email = email;
   }
 
@@ -32,6 +46,11 @@ export class User {
   }
 
   set password(password: string) {
+    if (!password)
+      throw new HttpException(
+        'Senha é obrigatória',
+        HttpStatus.BAD_REQUEST,
+      );
     this._password = password;
   }
 
