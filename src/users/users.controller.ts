@@ -3,12 +3,14 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpException,
   HttpStatus,
   Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('user')
 export class UsersController {
@@ -17,18 +19,12 @@ export class UsersController {
   // POST /user
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async postNewUser(@Body() body: any) {
-    // Check if the name is provided
-    if (!body.name) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: 'Name is required',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  async addUser(@Body() body: CreateUserDto) {
     // Call the service function to create a new user
-    return this.userService.postNewUser(body);
+    return this.userService.addUser(body);
+  }
+  @Get()
+  findAllUsers() {
+    return this.userService.findAllUsers();
   }
 }

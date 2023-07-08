@@ -1,21 +1,23 @@
 // The UsersService class contains a list of users and a method to add a new user to the list. The postNewUser method is called by the controller when a new user is created.
 
-import { Injectable } from '@nestjs/common';
-import { User } from './entity/User';
-import { ConflictException } from '@nestjs/common/exceptions';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException } from '@nestjs/common/exceptions';
+import { CreateUserDto } from './dto/create-user.dto';
+import * as bcrypt from 'bcrypt';
+import { UsersRepository } from './repository/user.repository';
 
 @Injectable()
 export class UsersService {
-  users: User[] = [];
+  constructor(private readonly usersRepository: UsersRepository) {}
 
-  postNewUser({ name, email, password, avatar }: User) {
-    // Check if a user with this email already exists in the list of users. If so, throw an exception.
-    const existingUser = this.users.find((user) => user.email === email);
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
-    }
-    // If a user with this email does not exist, create a new user and add them to the list.
-    const user = new User(name, email, password, avatar);
-    return this.users.push(user);
+  async addUser(data: CreateUserDto) {
+    const hashPassword = bcrypt.hashSync(data.password, 10);
+    const user = await this.usersRepository.findUserByEmail(data.email);
+    if (user)
+      throw new HttpException('User already exists', HttpStatus.CONFLICT);
+    await this.usersRepository.addUser({ ...data, password: hashPassword });
+  }
+  async findAllUsers() {
+    return await this.usersRepository.findAllUsers();
   }
 }
